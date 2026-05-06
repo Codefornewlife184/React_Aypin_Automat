@@ -24,9 +24,11 @@ function Slider2() {
             >
               <img
                 src="assets/img/Aypinautomat/sliderorj1.webp"
-                alt="Aypin Automat Slider"
+                alt="Aypin Otomat Slider"
                 width={"100%"}
                 height={"350vh"}
+                fetchpriority="high"
+                decoding="async"
               />
             </div>
           </div>

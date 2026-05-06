@@ -1,20 +1,38 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function Header() {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isProductsActive = ["/urunlerimiz", "/civata", "/pim", "/pirinc", "/burc"].includes(
+    (location.pathname || "").toLowerCase()
+  );
 
   const toggleNav = () => {
     setExpanded(!expanded);
   };
 
   const handleClick = () => {
-    window.scrollTo(0, 0);
+  // 1. Sayfayı en üste taşı
+  window.scrollTo(0, 0);
+  
+  // 2. Mobil menü açıksa kapat
+  if (setExpanded) {
     setExpanded(false);
-  };
+  }
+
+  // 3. Google Ads Takibi (Mükemmel dönüşüm için)
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('event', 'conversion', {
+      'send_to': 'AW-11391105725/2wM5CLnr-9kbEL312bcq', // Senin telefon/sayfa etiket kodun
+      'value': 1.0,
+      'currency': 'TRY'
+    });
+  }
+};
 
   const { t, i18n } = useTranslation();
 
@@ -33,8 +51,8 @@ function Header() {
         <Container className="container d-flex align-items-center justify-content-center">
           <Link to="/" className="logo" onClick={handleClick}>
             <img
-              src="assets/img/Aypinautomat/aypin 1.webp"
-              alt="Aypin Automat Logo"
+              src="/assets/img/Aypinautomat/aypin 1.webp"
+              alt="Aypin Otomat Logo"
               className="img-fluid"
               maxWidth={"100%"}
               height={"100%"}
@@ -48,54 +66,69 @@ function Header() {
           >
             <Nav className="ms-auto">
               <Nav.Link
-                as={Link}
+                as={NavLink}
                 to="/"
                 onClick={handleClick}
-                className="nav-link scrollto"
+                className={({ isActive }) => `nav-link scrollto${isActive ? " active" : ""}`}
               >
                 {t("Ana Sayfa")}
               </Nav.Link>
               <Nav.Link
-                as={Link}
-                to="/aboutus"
-                className="nav-link scrollto"
+                as={NavLink}
+                to="/hakkimizda"
+                className={({ isActive }) => `nav-link scrollto${isActive ? " active" : ""}`}
                 onClick={handleClick}
               >
                 {t("Hakkımızda")}
               </Nav.Link>
 
               <NavDropdown
-                title={t("Ürünlerimiz")}
+                title={
+                  <span style={{ display: "inline-flex", alignItems: "center" }}>
+                    <span
+                      className="nav-link scrollto"
+                      style={{ color: "#fff" }}
+                      onClickCapture={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate("/urunlerimiz");
+                        handleClick();
+                      }}
+                    >
+                      {t("Ürünlerimiz")}
+                    </span>
+                  </span>
+                }
                 id="collasible-nav-dropdown"
                 className="nav-link scroolto"
               >
-                <NavDropdown.Item as={Link} to="/civata" onClick={handleClick}>
+                <NavDropdown.Item as={NavLink} to="/civata" onClick={handleClick}>
                   {t("Özel Üretim Civatalar")}
                 </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/pim" onClick={handleClick}>
+                <NavDropdown.Item as={NavLink} to="/pim" onClick={handleClick}>
                   {t("Özel Üretim Pimler")}
                 </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/pirinc" onClick={handleClick}>
+                <NavDropdown.Item as={NavLink} to="/pirinc" onClick={handleClick}>
                   {t("Özel Üretim Pirinç Parçalar")}
                 </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/burc" onClick={handleClick}>
+                <NavDropdown.Item as={NavLink} to="/burc" onClick={handleClick}>
                   {t("Özel Üretim Burçlar")}
                 </NavDropdown.Item>
               </NavDropdown>
 
               <Nav.Link
-                as={Link}
-                to="/product"
-                className="nav-link scrollto"
+                as={NavLink}
+                to="/uretim"
+                className={({ isActive }) => `nav-link scrollto${isActive ? " active" : ""}`}
                 onClick={handleClick}
               >
                 {t("Üretim")}
               </Nav.Link>
 
               <Nav.Link
-                as={Link}
-                to="/contact"
-                className="nav-link scrollto"
+                as={NavLink}
+                to="/iletisim"
+                className={({ isActive }) => `nav-link scrollto${isActive ? " active" : ""}`}
                 onClick={handleClick}
               >
                 {t("İletişim")}
@@ -105,6 +138,15 @@ function Header() {
                 title={t("Bize Whatsapptan Ulaşın")}
                 target={"_blank"}
                 className="social-links"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  if (window.gtag) {
+                    window.gtag('event', 'whatsapp_click', {
+                      event_category: 'engagement',
+                      event_label: 'header_whatsapp',
+                    });
+                  }
+                }}
               >
                 <i className="bx bxl-whatsapp" style={{ fontSize: "24px" }}></i>
               </Nav.Link>

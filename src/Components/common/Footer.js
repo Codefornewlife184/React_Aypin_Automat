@@ -7,12 +7,30 @@ import { useTranslation } from "react-i18next";
 
 function Footer() {
   const { t } = useTranslation();
+  const year = new Date().getFullYear();
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  const handleContactClick = () => {
+    if (typeof window.gtag !== 'undefined') {
+      // 1. Mevcut telefon yapılandırmasını gönder
+      window.gtag('config', 'AW-11391105725/2wM5CLnr-9kbEL312bcq', {
+        'phone_conversion_number': '(+90) 532 162 1647'
+      });
+
+      // 2. ASIL ÖNEMLİ OLAN: Dönüşümü bir 'event' olarak tetikle
+      // Eğer WhatsApp için ayrı bir etiket kodun varsa '2wM5...' yerine onu yazmalısın
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-11391105725/2wM5CLnr-9kbEL312bcq',
+        'value': 1.0,
+        'currency': 'TRY'
+      });
+    }
   };
 
   return (
@@ -33,14 +51,13 @@ function Footer() {
                   <br />
                   <br />
                   <p>
-                    {t("Çalı Mahallesi Şen Cadde")} <br />
-                    {t("No : 21/A")} <br />
+                    Çalı Mahallesi <br />Ömer Biltekin Caddesi No : 4/A <br />
                     {t("Nilüfer / Bursa")}
                     <br />
                     <br />
                     <strong>{t("Gsm")} :</strong> (+90) 532 162 1647
                     <br />
-                    <strong>Email :</strong> info@aypinautomat.com
+                    <strong>Email :</strong> info@aypinotomat.com
                     <br />
                   </p>
                   <div className="social-links mt-3">
@@ -76,26 +93,32 @@ function Footer() {
                   </li>
                   <li>
                     <i className="bx bx-chevron-right"></i>
-                    <Link to="/aboutus" onClick={scrollToTop}>
+                    <Link to="/hakkimizda" onClick={scrollToTop}>
                       {t("Hakkımızda")}
                     </Link>
                   </li>
                   <li>
                     <i className="bx bx-chevron-right"></i>
-                    <Link to="/portfolios" onClick={scrollToTop}>
+                    <Link to="/urunlerimiz" onClick={scrollToTop}>
                       {t("Ürünlerimiz")}
                     </Link>
                   </li>
                   <li>
                     <i className="bx bx-chevron-right"></i>
-                    <Link to="/product" onClick={scrollToTop}>
+                    <Link to="/uretim" onClick={scrollToTop}>
                       {t("Üretim")}
                     </Link>
                   </li>
                   <li>
                     <i className="bx bx-chevron-right"></i>
-                    <Link to="/contact" onClick={scrollToTop}>
+                    <Link to="/iletisim" onClick={scrollToTop}>
                       {t("İletişim")}
+                    </Link>
+                  </li>
+                  <li>
+                    <i className="bx bx-chevron-right"></i>
+                    <Link to="/gizlilik-politikasi" onClick={scrollToTop}>
+                      {t("Gizlilik Politikası")}
                     </Link>
                   </li>
                 </ul>
@@ -139,10 +162,34 @@ function Footer() {
         <div className="container">
           <div className="copyright">
             <strong>
-              <span> AYPİN AUTOMAT &copy; 2023</span>
+              <span>
+                <a
+                  href="https://aypinotomat.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Aypin Otomat"
+                  style={{ color: "#fff", fontWeight: 700 }}
+                >
+                  AYPİN OTOMAT
+                </a>{" "}
+                &copy; {year}
+              </span>
             </strong>
             <br />
             {t("Tüm Hakları Saklıdır")}
+            <br />
+            <span>
+              {t("Web Tasarım")} :&nbsp;
+              <a
+                href="https://webcenter.com.tr"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Web Center"
+                style={{ color: "#10adad", fontWeight: 700 }}
+              >
+                Web Center
+              </a>
+            </span>
           </div>
         </div>
       </footer>
@@ -155,6 +202,7 @@ function Footer() {
       </a>
       <a
         href="https://wa.me/905321621647"
+        onClick={handleContactClick}
         title={t("Bize Whatsapptan Ulaşın")}
         target="_blank"
         className="back-to-top d-flex align-items-center justify-content-center active"

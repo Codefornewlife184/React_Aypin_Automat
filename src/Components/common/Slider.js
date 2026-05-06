@@ -8,7 +8,7 @@ function Slider2() {
           <div className="hero-img" data-aos="zoom-out" data-aos-delay="200">
             <img
               src="assets/img/Aypinautomat/slider1.jpg"
-              alt="Aypin Automat Slider"
+              alt="Aypin Otomat Slider"
               className="img-fluid"
             />
           </div>

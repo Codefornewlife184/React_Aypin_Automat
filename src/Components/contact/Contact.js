@@ -2,38 +2,113 @@
 /* eslint-disable jsx-a11y/no-redundant-roles */
 /* eslint-disable jsx-a11y/iframe-has-title */
 import React from "react";
-import emailjs from "emailjs-com";
 import Spacer from "../common/Spacer";
 import { useTranslation } from "react-i18next";
 
 function Contact() {
   const { t } = useTranslation();
+  const [sending, setSending] = React.useState(false);
+  const [notice, setNotice] = React.useState("");
+  const [noticeType, setNoticeType] = React.useState("info");
 
   function sendEmail(e) {
     e.preventDefault();
-
-    emailjs
-      .sendForm(
-        "service_kol10j6",
-        "template_3dj27vj",
-        e.target,
-        "NzLGFAgtvciJq5EXd"
-      )
-      .then(
-        (result) => {
-          console.log(result.text);
-          alert(t("Email başarıyla gönderildi!"));
-        },
-        (error) => {
-          console.log(error.text);
-          alert(t("Email gönderilirken bir hata oluştu!"));
+    if (!e.target.checkValidity()) {
+      e.target.reportValidity();
+      return;
+    }
+    const formData = new FormData(e.target);
+    const endpoint = process.env.REACT_APP_MAIL_ENDPOINT || "/mail/send.php";
+    setSending(true);
+    setNotice(t("Gönderiliyor..."));
+    setNoticeType("info");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    fetch(endpoint, {
+      method: "POST",
+      body: formData,
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        let data = {};
+        const ct = res.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          data = await res.json().catch(() => ({}));
+        } else {
+          const text = await res.text().catch(() => "");
+          data = { ok: res.ok, message: text };
         }
-      );
-    e.target.reset();
+        if (res.ok && data.ok) {
+          setNotice(t("Email başarıyla gönderildi!"));
+          setNoticeType("success");
+          if (window.gtag) {
+            window.gtag('event', 'conversion', {
+              send_to: 'AW-11391105725/fAggCOb_odsbEL312bcq'
+            });
+          }
+          e.target.reset();
+        } else {
+          const msg = (data && (data.error || data.message)) ? `${data.message || ''} ${data.error || ''}`.trim() : null;
+          setNotice(msg || t("Email gönderilirken bir hata oluştu!"));
+          setNoticeType("error");
+        }
+      })
+      .catch((err) => {
+        if (err && err.name === "AbortError") {
+          setNotice(t("Sunucu yanıt vermedi. Lütfen tekrar deneyin."));
+        } else {
+          setNotice(t("Email gönderilirken bir hata oluştu!"));
+        }
+        setNoticeType("error");
+      })
+      .finally(() => {
+        clearTimeout(timeoutId);
+        setSending(false);
+        setTimeout(() => setNotice(""), 6000);
+      });
   }
 
   return (
     <>
+      {notice && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999,
+            background: noticeType === "success" ? "#e6ffed" : "#ffe6e6",
+            color: noticeType === "success" ? "#065f46" : "#7f1d1d",
+            border: "1px solid",
+            borderColor: noticeType === "success" ? "#34d399" : "#f87171",
+            borderRadius: 12,
+            padding: "12px 16px",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}
+          role="alert"
+        >
+          <span style={{ fontWeight: 600 }}>
+            {notice}
+          </span>
+          <button
+            onClick={() => setNotice("")}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: noticeType === "success" ? "#065f46" : "#7f1d1d",
+              cursor: "pointer",
+              fontWeight: 700,
+            }}
+            aria-label="Kapat"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <section id="services" className="services section-bg">
         <Spacer />
         <div className="container" data-aos="fade-up">
@@ -58,7 +133,7 @@ function Contact() {
                 </div>
                 <h3 className="title text-center">{t("Adresimiz")}</h3>
                 <p className="description text-center">
-                  {t("Çalı Mahallesi Şen Cadde No : 21/A Nilüfer / Bursa")}
+                  Çalı Mahallesi Ömer Biltekin Caddesi No : 4/A Nilüfer / Bursa
                 </p>
               </div>
             </div>
@@ -69,7 +144,22 @@ function Contact() {
                   <i className="bx bx-phone-call"></i>
                 </div>
                 <h3 className="title text-center">{t("Gsm")}</h3>
-                <p className="description text-center">(+90) 532 162 1647</p>
+                <p className="description text-center">
+                  <a
+                    href="tel:+905321621647"
+                    aria-label="Telefon araması başlat: +90 532 162 1647"
+                    onClick={() => {
+                      if (window.gtag) {
+                        window.gtag('event', 'phone_click', {
+                          event_category: 'engagement',
+                          event_label: 'contact_phone',
+                        });
+                      }
+                    }}
+                  >
+                    (+90) 532 162 1647
+                  </a>
+                </p>
               </div>
             </div>
 
@@ -79,15 +169,30 @@ function Contact() {
                   <i className="bx bx-envelope"></i>
                 </div>
                 <h3 className="title text-center">{t("Email")}</h3>
-                <p className="description text-center">info@aypinautomat.com</p>
+                <p className="description text-center">
+                  <a
+                    href="mailto:info@aypinotomat.com"
+                    aria-label="E-posta gönder: info@aypinotomat.com"
+                    onClick={() => {
+                      if (window.gtag) {
+                        window.gtag('event', 'email_click', {
+                          event_category: 'engagement',
+                          event_label: 'contact_email',
+                        });
+                      }
+                    }}
+                  >
+                    info@aypinotomat.com
+                  </a>
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="row contact">
+          <div className="row contact mb-5">
             <div className="col-lg-6">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12194.831007320683!2d28.9093333517199!3d40.17106014006093!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14ca10ed3e42418f%3A0x67560ac9aa2cae3a!2zw4dhbMSxLCDFnmVuIENkLiBObzoyMSwgMTYxMTAgTmlsw7xmZXIvQnVyc2E!5e0!3m2!1str!2str!4v1683735425991!5m2!1str!2str"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2155.620981177162!2d28.922950726466162!3d40.17549727984258!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x61e0586e850849b9%3A0x44231d1c42788894!2sAypin%20Otomat%20%7C%20CNC%20Kayar%20Otomat%20%7C%20Bursa!5e0!3m2!1sen!2str!4v1766210939547!5m2!1sen!2str"
                 style={{
                   border: "4px solid white",
                   width: "100%",
@@ -151,6 +256,7 @@ function Contact() {
                         background: "#0000ff",
                         color: "#fff",
                       }}
+                      disabled={sending}
                     />
                   </div>
                 </div>

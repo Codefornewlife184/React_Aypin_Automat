@@ -1,9 +1,23 @@
-<IfModule mod_rewrite.c>
-RewriteEngine on
-# Don't rewrite files or directories
+Options -MultiViews -Indexes
+RewriteEngine On
+RewriteBase /
+DirectoryIndex index.html
+
+# 1. SSL VE DOMAIN YÖNLENDİRMESİ
+# Tüm trafiği https://aypinotomat.com adresine toplar
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [OR]
+RewriteCond %{HTTP_HOST} ^aypinautomat\.com$ [NC]
+RewriteRule ^(.*)$ https://aypinotomat.com/$1 [L,R=301]
+
+# 2. GERÇEK DOSYALARI KORU
+# Resim, CSS, JS gibi dosyalar varsa onları direkt açar
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
-# Rewrite everything else to index.html to allow html5 state links
-RewriteRule ^ index.html [L]
-</IfModule>
+
+# 3. REACT ROUTER SPA DESTEĞİ
+# Sunucuda bulunmayan her şeyi index.html'e (React'a) gönderir.
+# React Router (CustomRoutes.js) içerideki path'e göre doğru sayfayı açar.
+RewriteRule ^index\.html$ - [L]
+RewriteRule . /index.html [L,QSA]

@@ -8,7 +8,7 @@ function Slider1() {
         <img
           className="d-block w-100 resimSlider"
           src="/assets/img/Aypinautomat/slider1.jpg"
-          alt="Aypin Automat Slider"
+          alt="Aypin Otomat Slider"
         />
         <Carousel.Caption className="slider carousel-caption d-none d-md-block">
           <h2 style={{ textTransform: "capitalize" }}>Talaşlı İmalat</h2>
@@ -54,7 +54,7 @@ function Slider1() {
         <img
           className="d-block w-100 resimSlider"
           src="/assets/img/Aypinautomat/slider1.jpg"
-          alt="Aypin Automat Slider"
+          alt="Aypin Otomat Slider"
         />
         <Carousel.Caption className="slider carousel-caption d-none d-md-block">
           <h2 style={{ textTransform: "capitalize" }}>Talaşlı İmalat</h2>
@@ -100,7 +100,7 @@ function Slider1() {
         <img
           className="d-block w-100 resimSlider"
           src="/assets/img/Aypinautomat/slider1.jpg"
-          alt="Aypin Automat Slider"
+          alt="Aypin Otomat Slider"
         />
         <Carousel.Caption className="slider carousel-caption d-none d-md-block">
           <h2 style={{ textTransform: "capitalize" }}>Talaşlı İmalat</h2>

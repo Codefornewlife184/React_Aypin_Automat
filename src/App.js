@@ -5,6 +5,7 @@ import Footer from "./Components/common/Footer";
 import Header from "./Components/common/Header";
 import CustomRoutes from "./router/CustomRoutes";
 import { useTranslation } from "react-i18next";
+import TopBar from "./Components/common/TopBar";
 
 function App() {
   const { i18n } = useTranslation();
@@ -23,6 +24,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <TopBar changeLanguage={changeLanguage} />
         <Header changeLanguage={changeLanguage} />
         <CustomRoutes changeLanguage={changeLanguage} />
         <Footer changeLanguage={changeLanguage} />

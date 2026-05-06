@@ -1,4 +1,4 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
+Allow: /
 
-Sitemap: https://aypinautomat.com/sitemap.xml
+Sitemap: https://aypinotomat.com/sitemap.xml
